@@ -8,11 +8,11 @@ function Test-Passports {
 
     $Result = @()
 
-    $Passports = $Data -Split "`r`n"
+    $Passports = $Data -Split "`n`n"
 
     # Validate passwords
     for ($i = 0; $i -lt $Passports.Count; $i++) {
-        $Entries = $Passports[$i].Split("`r").Split(" ")
+        $Entries = $Passports[$i].Split("`n").Split(" ")
         $PassportResults = @();
 
         $HasFields = -not (($RequiredFields | % {$Entries.Split(":") -contains $_}) -contains $false)
