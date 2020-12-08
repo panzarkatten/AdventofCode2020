@@ -1,4 +1,4 @@
-$InputData = Get-Content "input_test.txt" -Delimiter "`n`n"
+$InputData = (Get-Content "input_test.txt" -Raw) -Split "`r`n`r`n"
 
 function Measure-Answares {
     param (
@@ -7,10 +7,10 @@ function Measure-Answares {
     )
 
     if (-not $PartTwo) {
-        ($Answares | % {$_.Replace("`n", "").ToCharArray() | Sort-Object | Get-Unique}).Count    
+        return $Answares | % {$_.Replace("`r`n", "").ToCharArray() | Sort-Object | Get-Unique}   
     } Else {
         foreach ($Set in $Answares) {
-            $People = ($Set | Measure-Object -Word).Words
+            $Rows = ($Set | Measure-Object -Word).Words
             $UniqueAnswares = Measure-Answares $Set
 
             Write-Host "$People : $UniqueAnswares"
@@ -23,5 +23,13 @@ function Measure-Answares {
 
 }
 
-Measure-Answares -Answares $InputData
+Write-Host "Part #1: " -NoNewline
+(Measure-Answares -Answares $InputData).Count
 Measure-Answares -Answares $InputData -PartTwo
+
+for ($i = 0; $i -lt $InputData.Count; $i++) {
+    Write-Host $i ":" $InputData[$i]
+    Write-Host ""
+}
+
+Write-Host "Count:" $InputData.Count
