@@ -1,7 +1,5 @@
 $InputData = Get-Content "input.txt" -Raw
 $Fields = @('byr','iyr','eyr','hgt','hcl','ecl','pid')
-Remove-Variable "ValidatedPasswords" -ErrorAction SilentlyContinue
-
 function Test-Passports {
     param (
         [string]$Data,
@@ -10,46 +8,27 @@ function Test-Passports {
 
     $Result = @()
 
-    $Passports = $Data -Split "`n`n"
-
-    Write-Host "Number of Passports:" $Passports.Count
+    $Passports = $Data -Split "`r`n"
 
     # Validate passwords
     for ($i = 0; $i -lt $Passports.Count; $i++) {
-        Write-host "`nPassport #"$i
-        # Write-Host "Passport:" $Passports[$i]
-        $Entries = $Passports[$i].Split("`n").Split(" ")
-<#         foreach ($Entry in $Entries) {
-            Write-Host "-" $Entry
-        } #>
-
-        # $Result += -not (($RequiredFields | % {$Entries.Split(":") -contains $_}) -contains $false)
-        # $Result += -not (($RequiredFields | % { if ($Entries.Split(":") -contains $_) {Test-PassportField $Entries} Else {$false}}) -contains $false)
+        $Entries = $Passports[$i].Split("`r").Split(" ")
         $PassportResults = @();
 
         $HasFields = -not (($RequiredFields | % {$Entries.Split(":") -contains $_}) -contains $false)
 
         if ($HasFields) {
             foreach ($Entry in $Entries) {
-                $TestResult = Test-PassportField $Entry.Trim()
-                Write-Host "$Entry => $TestResult"
-                $PassportResults += $TestResult
+                $PassportResults += Test-PassportField $Entry.Trim()
             } 
         } Else {
             $PassportResults += $false
         }
 
-
-        Write-Host "`nPassportResults:" $PassportResults
-        $PassportValid = -not ($PassportResults -contains $false)
-            Write-Host "Passport is" $PassportValid
-            Write-Host " "
-        $Result += $PassportValid
-        
+        $Result += -not ($PassportResults -contains $false)
     }
 
     return $Result
-
 }
 
 function Test-PassportField {
@@ -92,6 +71,4 @@ function Test-PassportField {
 }
 
 $ValidatedPassports = Test-Passports -Data $InputData -RequiredFields $Fields
-
-Write-Host "Valid Passports: " -NoNewline
 ($ValidatedPassports -eq $true).Count
